@@ -186,12 +186,13 @@ pipeline {
                 script {
                     sh '''
                         if [ -f package.json ]; then
-                            echo "Installing dependencies for linting..."
-                            npm install --only=dev 2>/dev/null || npm install
+                            echo "Running linting in Node.js container..."
                             
-                            echo ""
-                            echo "=== Running ESLint ==="
-                            npm run lint || echo "⚠️  No lint script found or linting failed"
+                            docker run --rm \
+                              -v $(pwd):/app \
+                              -w /app \
+                              node:18-alpine \
+                              sh -c "npm install && npm run lint || echo '⚠️  No lint script found or linting failed'"
                             
                             echo ""
                             echo "=== Code Statistics ==="
@@ -213,16 +214,21 @@ pipeline {
                 script {
                     sh '''
                         if [ -f package.json ]; then
-                            echo "Installing dependencies..."
-                            npm install
+                            echo "Running tests in Node.js container..."
                             
-                            echo ""
-                            echo "=== Running Tests ==="
-                            npm test || echo "⚠️  No test script found or tests failed"
+                            docker run --rm \
+                              -v $(pwd):/app \
+                              -w /app \
+                              node:18-alpine \
+                              sh -c "npm install && npm test || echo '⚠️  No test script found or tests failed'"
                             
                             echo ""
                             echo "=== Test Coverage ==="
-                            npm run test:coverage 2>/dev/null || echo "No coverage script available"
+                            docker run --rm \
+                              -v $(pwd):/app \
+                              -w /app \
+                              node:18-alpine \
+                              sh -c "npm run test:coverage 2>/dev/null || echo 'No coverage script available'"
                         else
                             echo "⚠️  No package.json found, skipping tests"
                         fi
