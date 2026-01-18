@@ -8,7 +8,7 @@ pipeline {
         // Git Configuration
         string(
             name: 'APP_REPO_URL',
-            defaultValue: 'https://github.com/YOUR-USERNAME/my-web-app.git',
+            defaultValue: 'https://github.com/Narek97/my-web-app.git',
             description: 'Git repository URL of your application'
         )
         
